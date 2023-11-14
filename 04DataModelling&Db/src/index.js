@@ -3,6 +3,7 @@ import app from "./app.js";
 import ConnectionToDB from "./db/Connection.js";
 
 /**
+ * structured
  * was making mistake in .env file & after connection call
  */
 dotenv.config({
