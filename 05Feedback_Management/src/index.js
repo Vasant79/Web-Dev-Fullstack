@@ -1,12 +1,17 @@
-import express from "express";
+import app from "./app.js";
 import passport from "passport";
+import connection from "./db/dbConnection.js";
+import { user } from "./models/user.js";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 /**
  * always do in professional structure
  */
 
-const app = express();
+connection().then(() => {
+  app.listen(3002);
+  console.log("db listning on 3002");
+});
 
 const PORT = process.env.PORT || 3001;
 //let GoogleStrategy = require("passport-google-oauth20").Strategy;
@@ -25,9 +30,12 @@ passport.use(
     function (accessToken, refreshToken, profile, cb) {
       //   User.findOrCreate({ googleId: profile.id }, function (err, user) {
       //     return cb(err, user);
-      console.log(accessToken);
-      console.log(refreshToken);
-      console.log(profile);
+      // console.log(accessToken);
+      // console.log(refreshToken);
+
+      console.log(profile.id);
+      //storing id to db -- using .save() to save the data to db
+      new user({ id: profile.id }).save();
     }
   )
 );
