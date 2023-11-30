@@ -5,11 +5,11 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
     },
-    id: {
-      type: Number,
+    googleId: {
+      type: String,
     },
   },
   { timeStamps: true }
 );
 
-export const user = mongoose.model("user", userSchema);
+export const User = mongoose.model("User", userSchema);

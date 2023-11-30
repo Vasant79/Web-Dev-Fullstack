@@ -1,56 +1,28 @@
-import app from "./app.js";
+import express from "express";
+import cookieSession from "cookie-session";
 import passport from "passport";
+import "./service/googleAuth.js";
 import connection from "./db/dbConnection.js";
-import { user } from "./models/user.js";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import router from "./routes/googleAuthRoute.js";
 
-/**
- * always do in professional structure
- */
+const app = express();
+const PORT = process.env.PORT || 3001;
 
 connection().then(() => {
-  app.listen(3002);
-  console.log("db listning on 3002");
+  app.listen(PORT);
+  console.log("connection done");
 });
 
-const PORT = process.env.PORT || 3001;
-//let GoogleStrategy = require("passport-google-oauth20").Strategy;
-
-//client id 871783877623-ah8p61cgvdb0sa5v2s8jt71qgr9fkoc6   .apps.googleusercontent.com
-// client secret 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
-
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID:
-        "871783877623-ah8p61cgvdb0sa5v2s8jt71qgr9fkoc6.apps.googleusercontent.com",
-      clientSecret: "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",
-      callbackURL: "/auth/google/callback",
-    },
-    function (accessToken, refreshToken, profile, cb) {
-      //   User.findOrCreate({ googleId: profile.id }, function (err, user) {
-      //     return cb(err, user);
-      // console.log(accessToken);
-      // console.log(refreshToken);
-
-      console.log(profile.id);
-      //storing id to db -- using .save() to save the data to db
-      new user({ id: profile.id }).save();
-    }
-  )
-);
-
-app.get(
-  "/auth/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
+// see cookie in browser
+app.use(
+  cookieSession({
+    // Cookie Options
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    /* secret keys */
+    keys: ["testing"],
   })
 );
 
-app.get("/auth/google/callback", passport.authenticate("google"));
-
-app.get("/", (req, res) => {
-  res.send("Hello user");
-});
-
-app.listen(PORT);
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(router);
